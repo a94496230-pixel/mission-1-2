@@ -1,3 +1,5 @@
+import json
+
 # 📐 퀴즈 1문제 설계도
 class Quiz: # Quiz 클래스
     def __init__(self, question, choices, answer): # 정보 담기
@@ -20,13 +22,74 @@ class Quiz: # Quiz 클래스
             print(f"아쉬워요! 정답은 {self.answer}번! 😢")
             return False
 
-# 📚 문제들 만들기
-quizzes = [
-    Quiz("김치의 원조 나라는?", ["대한민국", "중국", "대만", "일본"], 1),
-    Quiz("피자의 원조 나라는?", ["미국", "이탈리아", "프랑스", "일본"], 2),
-    Quiz("초밥은 어느 나라 음식일까요?", ["한국", "중국", "일본", "태국"], 3),
-]
-best_score = 0         # ← 이거 추가! 🏆
+
+def save_data():
+    quiz_list = []                    # 빈 리스트 준비
+    for q in quizzes:                 # 퀴즈 하나씩 꺼내서
+        quiz_list.append([q.question, q.choices, q.answer])  # 리스트로 풀어서 담기! 0, 1, 2
+    data = {
+        "best_score": best_score,
+        "quizzes": quiz_list
+    }
+    with open("test.json", "w") as f:
+        json.dump(data, f, ensure_ascii=False)   # 한글 안 깨지게!
+
+try:
+    with open("test.json", "r") as f:
+        data = json.load(f)
+        best_score = data["best_score"]      # 점수 꺼내기
+        quizzes = []                         # 빈 리스트 준비
+        for item in data["quizzes"]:         # 저장된 퀴즈 하나씩, item은 임의로 지은 이름
+            quizzes.append(Quiz(item[0], item[1], item[2]))  # 다시 Quiz로 조립!
+except (FileNotFoundError, KeyError):
+    best_score = 0
+    quizzes = [                              # 파일 없으면 나올 기본 퀴즈
+        Quiz("김치의 원조 나라는?", ["대한민국", "중국", "대만", "일본"], 1),
+        Quiz("피자의 원조 나라는?", ["미국", "이탈리아", "프랑스", "일본"], 2),
+        Quiz("초밥은 어느 나라 음식일까요?", ["한국", "중국", "일본", "태국"], 3),
+    ]
+
+print("저장 완료!")
+
+# QuizGame 클래스 추가 
+
+class QuizGame:
+    def __init__(self):                    # 👈 추가!
+        self.best_score = 0                # 최고 점수
+        self.quizzes = [                   # 퀴즈 목록 (self로!)
+            Quiz("김치의 원조 나라는?", ["대한민국", "중국", "대만", "일본"], 1),
+            Quiz("피자의 원조 나라는?", ["미국", "이탈리아", "프랑스", "일본"], 2),
+            Quiz("초밥은 어느 나라 음식일까요?", ["한국", "중국", "일본", "태국"], 3),
+        ]
+
+    def show_menu(self):              # 👈 self 꼭 넣기!
+        print("===== 🍔 음식 퀴즈 게임 =====")
+        print("1. 퀴즈 풀기")
+        print("2. 퀴즈 추가")
+        print("3. 퀴즈 목록")
+        print("4. 최고 점수")
+        print("5. 종료")
+
+    def show_list(self):
+        print("===== 📋 퀴즈 목록 =====")
+        for quiz in self.quizzes:          
+            quiz.show()             
+            print()     
+
+    def play_quiz(self):
+        score = 0
+        for quiz in self.quizzes:    # 👈 self 붙이기!
+            if quiz.ask():
+                score = score + 1
+        print(f"총 {score}점이에요! 🎯")
+
+
+        
+game = QuizGame()      # 👈 인스턴스 만들기! (__init__ 실행됨)
+
+
+
+# 클래스 추가 전 내용
 
 while True:
     print("===== 🍔 음식 퀴즈 게임 =====")
@@ -47,6 +110,7 @@ while True:
         if score > best_score:         # 이번 점수가 최고 점수보다 높으면?
             best_score = score         # 최고 점수 갱신! 📈
             print("🎉 새로운 최고 점수 달성!")
+            save_data() # 점수 저장
         
     elif choice == "2":
         print("===== ✏️ 퀴즈 추가 =====")
@@ -61,6 +125,7 @@ while True:
         new_quiz = Quiz(question, choices, answer)
         quizzes.append(new_quiz)
         print("퀴즈가 추가되었습니다! ✅")
+        save_data()
 
     elif choice == "3":
         print("===== 📋 퀴즈 목록 =====")
