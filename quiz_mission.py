@@ -23,11 +23,11 @@ class Quiz: # Quiz 클래스
         print()                        # 먼저 문제를 보여줘.
         while True:
             try: # 보기를 제외한 답을 입력했을 경우 발생하는 오류 방지, 일단 시도!
-                user = int(input("정답 번호: ")) # 입력한 값을 숫자로 변환
+                user = int(input("정답 번호: ").strip()) # 입력한 값을 숫자로 변환
                 if 1 <= user <= 4:              # 1~4 인지 확인
                     break
                 else: print("1~4 중에서 골라주세요!") # 숫자인데 1~4가 아니다?
-            except:
+            except ValueError:    # 숫자변환 실패 에러
                 print("보기에 해당하는 숫자로 입력해주세요!") # 숫자 외의 답을 입력했다?
 
         if user == self.answer:        # int는 정수. 문자를 숫자로 바꿔줌. 1도 문자 1과 숫자 1이 다름.
@@ -130,8 +130,10 @@ class QuizGame:
                 Quiz(d["question"], d["choices"], d["answer"], d["explanation"])
                 for d in data["quizzes"]             # 딕셔너리 하나씩
             ]
-        except:
+        except FileNotFoundError: # 파일이 없을 경우
             print("저장된 데이터가 없어요! 새로 시작합니다 😊")
+        except (json.JSONDecodeError, KeyError): # 파일이 손상 되었을 경우
+            print("⚠️ 데이터 파일이 손상되어 기본 데이터로 복구합니다.")
 
     def all_quizzes(self):
         """기본 + 추가 문제를 합쳐서 돌려줌"""
@@ -158,6 +160,9 @@ class QuizGame:
     def play_quiz(self):
         score = 0
         quizzes = self.all_quizzes()
+        if not quizzes:                      # 퀴즈가 하나도 없을경우.(미션내용. 코드에 기본문제가 포함되어있어 발생하지 않음)
+            print("아직 퀴즈가 없어요! 먼저 추가해주세요 😊")
+            return
         random.shuffle(quizzes)
         for quiz in quizzes:
             if quiz.ask():
@@ -174,36 +179,46 @@ class QuizGame:
 
     def run(self):
         while True:
-            self.show_menu()                    # 메뉴 보여주기
-            choice = input("번호 선택: ")        # 입력받기
+            try:
+                self.show_menu()                        # 메뉴 보여주기
+                choice = input("번호 선택: ").strip()    # 입력받기.앞뒤의 공백제거
 
-            if choice == "1":
-                self.play_quiz()                # 퀴즈 풀기!
+                if choice == "": # 공백 입력시
+                    print("번호를 입력해주세요! 😊") 
+                    continue  # 다시 메뉴로 돌아가기
 
-            elif choice == "2":
-                q = clean(input("문제: "))
-                c1 = clean(input("선택지 1: "))
-                c2 = clean(input("선택지 2: "))
-                c3 = clean(input("선택지 3: "))
-                c4 = clean(input("선택지 4: "))
-                a = int(input("정답 번호(1~4): "))   # 👈 숫자는 그대로 둬요!
-                e = clean(input("해설: "))          
-                new_quiz = Quiz(q, [c1, c2, c3, c4], a, e)     # 새 custom_quiz 만들기!
-                self.custom_quizzes.append(new_quiz)               # 목록에 추가!
-                self.save_data()                          # json 파일에 저장
-                print("퀴즈가 추가됐어요! ✨")
+                if choice == "1":
+                    self.play_quiz()                # 퀴즈 풀기!
 
-            elif choice == "3":
-                self.show_list()                # 목록 보기!
+                elif choice == "2":
+                    q = clean(input("문제: "))
+                    c1 = clean(input("선택지 1: "))
+                    c2 = clean(input("선택지 2: "))
+                    c3 = clean(input("선택지 3: "))
+                    c4 = clean(input("선택지 4: "))
+                    a = int(input("정답 번호(1~4): "))   # 👈 숫자는 그대로 둬요!
+                    e = clean(input("해설: "))          
+                    new_quiz = Quiz(q, [c1, c2, c3, c4], a, e)     # 새 custom_quiz 만들기!
+                    self.custom_quizzes.append(new_quiz)               # 목록에 추가!
+                    self.save_data()                          # json 파일에 저장
+                    print("퀴즈가 추가됐어요! ✨")
 
-            elif choice == "4":
-                print(f"🏆 최고 점수는 {self.best_score}점이에요!")
+                elif choice == "3":
+                    self.show_list()                # 목록 보기!
 
-            elif choice == "5":
-                print("게임을 종료해요! 👋")
-                break                           # 반복 끝!
-            else:
-                print("아직 준비 중이에요! 😊")
+                elif choice == "4":
+                    print(f"🏆 최고 점수는 {self.best_score}점이에요!")
+
+                elif choice == "5":
+                    print("게임을 종료해요! 👋")
+                    break                           # 반복 끝!
+                else:
+                    print("1~5 중에서 골라주세요! 😊")
+
+            except (KeyboardInterrupt, EOFError):   # Ctrl+C, 입력 종료
+                print("\n안전하게 저장 후 종료할게요! 👋")
+                self.save_data()                       # 저장 후 종료
+                break    
 
 
 
