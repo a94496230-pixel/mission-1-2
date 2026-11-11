@@ -5,7 +5,7 @@ import json
 def clean(text): # 저장할 수 없는 깨진 글자(서로게이트)를 제거
     return text.encode("utf-8", "ignore").decode("utf-8")
 
-def input_number(self, prompt, low, high): # low~high 범위의 숫자를 받을 때까지 반복
+def input_number(prompt, low, high): # 반복적으로 사용된 while루프를 함수로 만들어 아래 적용. low~high 범위 숫자를 받을 때 까지 반복함.
     
     while True:
         value = input(prompt).strip()   # 앞뒤 공백 제거
@@ -40,14 +40,7 @@ class Quiz: # Quiz 클래스
     def ask(self):
         self.show()
         print()                        # 먼저 문제를 보여줘.
-        while True:
-            try: # 보기를 제외한 답을 입력했을 경우 발생하는 오류 방지, 일단 시도!
-                user = int(input("정답 번호: ").strip()) # 입력한 값을 숫자로 변환
-                if 1 <= user <= 4:              # 1~4 인지 확인
-                    break
-                else: print("1~4 중에서 골라주세요!") # 숫자인데 1~4가 아니다?
-            except ValueError:    # 숫자변환 실패 에러
-                print("보기에 해당하는 숫자로 입력해주세요!") # 숫자 외의 답을 입력했다?
+        user = input_number("정답 번호: ", 1, 4)  # while 루프를 함수로 대체
 
         if user == self.answer:        # int는 정수. 문자를 숫자로 바꿔줌. 1도 문자 1과 숫자 1이 다름.
             print("정답이에요! 🎉")
@@ -215,7 +208,7 @@ class QuizGame:
                     c2 = clean(input("선택지 2: "))
                     c3 = clean(input("선택지 3: "))
                     c4 = clean(input("선택지 4: "))
-                    a = int(input("정답 번호(1~4): "))   # 👈 숫자는 그대로 둬요!
+                    a = input_number("정답 번호(1~4): ", 1, 4)   # 👈 숫자는 그대로 둬요!
                     e = clean(input("해설: "))          
                     new_quiz = Quiz(q, [c1, c2, c3, c4], a, e)     # 새 custom_quiz 만들기!
                     self.custom_quizzes.append(new_quiz)               # 목록에 추가!
