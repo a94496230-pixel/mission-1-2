@@ -1,5 +1,7 @@
 import random
 import json
+def clean(text): # 저장할 수 없는 깨진 글자(서로게이트)를 제거
+    return text.encode("utf-8", "ignore").decode("utf-8")
 
 # 📐 퀴즈 1문제 설계도
 class Quiz: # Quiz 클래스
@@ -168,13 +170,13 @@ class QuizGame:
                 self.play_quiz()                # 퀴즈 풀기!
 
             elif choice == "2":
-                q = input("문제: ")                        # 문제 입력
-                c1 = input("선택지 1: ")
-                c2 = input("선택지 2: ")
-                c3 = input("선택지 3: ")
-                c4 = input("선택지 4: ")
-                a = int(input("정답 번호(1~4): "))  # 정답 (숫자로!)
-                e = input("해설: ")          
+                q = clean(input("문제: "))
+                c1 = clean(input("선택지 1: "))
+                c2 = clean(input("선택지 2: "))
+                c3 = clean(input("선택지 3: "))
+                c4 = clean(input("선택지 4: "))
+                a = int(input("정답 번호(1~4): "))   # 👈 숫자는 그대로 둬요!
+                e = clean(input("해설: "))          
                 new_quiz = Quiz(q, [c1, c2, c3, c4], a, e)     # 새 custom_quiz 만들기!
                 self.custom_quizzes.append(new_quiz)               # 목록에 추가!
                 self.save_data()                          # json 파일에 저장
