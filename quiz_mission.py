@@ -1,7 +1,26 @@
 import random
+
 import json
+
 def clean(text): # 저장할 수 없는 깨진 글자(서로게이트)를 제거
     return text.encode("utf-8", "ignore").decode("utf-8")
+
+def input_number(self, prompt, low, high): # low~high 범위의 숫자를 받을 때까지 반복
+    
+    while True:
+        value = input(prompt).strip()   # 앞뒤 공백 제거
+        if value == "":                 # 빈 입력
+            print("숫자를 입력해주세요!")
+            continue
+        try:
+            num = int(value)
+            if low <= num <= high:
+                return num              # 올바른 값이면 돌려줌
+            else:
+                print(f"{low}~{high} 중에서 골라주세요!")
+        except ValueError:
+            print("숫자로 입력해주세요!")
+
 
 # 📐 퀴즈 1문제 설계도
 class Quiz: # Quiz 클래스
