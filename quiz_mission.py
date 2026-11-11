@@ -1,3 +1,4 @@
+import random
 import json
 
 # 📐 퀴즈 1문제 설계도
@@ -13,43 +14,23 @@ class Quiz: # Quiz 클래스
             print(f"{i+1}. {self.choices[i]}")
 
     def ask(self):
-        self.show()                        # 먼저 문제를 보여주고
-        user = input("정답 번호: ")         # 답 입력받기
-        if int(user) == self.answer:        # int는 정수. 문자를 숫자로 바꿔줌. 1도 문자 1과 숫자 1이 다름.
+        self.show()                        # 먼저 문제를 보여줘.
+        while True:
+            try: # 보기를 제외한 답을 입력했을 경우 발생하는 오류 방지, 일단 시도!
+                user = int(input("정답 번호: ")) # 입력한 값을 숫자로 변환
+                if 1 <= user <= 4:              # 1~4 인지 확인
+                    break
+                else: print("1~4 중에서 골라주세요!") # 숫자인데 1~4가 아니다?
+            except:
+                print("보기에 해당하는 숫자로 입력해주세요!") # 숫자 외의 답을 입력했다?
+
+        if user == self.answer:        # int는 정수. 문자를 숫자로 바꿔줌. 1도 문자 1과 숫자 1이 다름.
             print("정답이에요! 🎉")
             return True                   # return은 점수를 위해
         else:
             print(f"아쉬워요! 정답은 {self.answer}번! 😢")
             return False
-
-
-def save_data():
-    quiz_list = []                    # 빈 리스트 준비
-    for q in quizzes:                 # 퀴즈 하나씩 꺼내서
-        quiz_list.append([q.question, q.choices, q.answer])  # 리스트로 풀어서 담기! 0, 1, 2
-    data = {
-        "best_score": best_score,
-        "quizzes": quiz_list
-    }
-    with open("test.json", "w") as f:
-        json.dump(data, f, ensure_ascii=False)   # 한글 안 깨지게!
-
-try:
-    with open("test.json", "r") as f:
-        data = json.load(f)
-        best_score = data["best_score"]      # 점수 꺼내기
-        quizzes = []                         # 빈 리스트 준비
-        for item in data["quizzes"]:         # 저장된 퀴즈 하나씩, item은 임의로 지은 이름
-            quizzes.append(Quiz(item[0], item[1], item[2]))  # 다시 Quiz로 조립!
-except (FileNotFoundError, KeyError):
-    best_score = 0
-    quizzes = [                              # 파일 없으면 나올 기본 퀴즈
-        Quiz("김치의 원조 나라는?", ["대한민국", "중국", "대만", "일본"], 1),
-        Quiz("피자의 원조 나라는?", ["미국", "이탈리아", "프랑스", "일본"], 2),
-        Quiz("초밥은 어느 나라 음식일까요?", ["한국", "중국", "일본", "태국"], 3),
-    ]
-
-print("저장 완료!")
+        
 
 # QuizGame 클래스 추가 
 
@@ -61,6 +42,40 @@ class QuizGame:
             Quiz("피자의 원조 나라는?", ["미국", "이탈리아", "프랑스", "일본"], 2),
             Quiz("초밥은 어느 나라 음식일까요?", ["한국", "중국", "일본", "태국"], 3),
         ]
+        self.custom_quizzes = []  # 추가문제를 위한 비어있는 리스트
+        self.load_data() 
+
+    def save_data(self):
+        data = {
+            "best_score": self.best_score,          # 최고 점수
+            "quizzes": [                            # 퀴즈들을 딕셔너리로!
+                {
+                    "question": q.question,
+                    "choices": q.choices,
+                    "answer": q.answer
+                }
+                for q in self.custom_quizzes               # 퀴즈 하나씩 변환
+            ]
+        }
+        with open("state.json", "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        print("저장 완료!")
+
+    def load_data(self):
+        try:
+            with open("state.json", "r", encoding="utf-8") as f:
+                data = json.load(f)                  # 파일 읽기
+            self.best_score = data["best_score"]     # 점수는 그대로
+            self.custom_quizzes = [                         # 👇 여기에서 추가문제 조립!
+                Quiz(d["question"], d["choices"], d["answer"])
+                for d in data["quizzes"]             # 딕셔너리 하나씩
+            ]
+        except:
+            print("저장된 데이터가 없어요! 새로 시작합니다 😊")
+
+    def all_quizzes(self):
+        """기본 + 추가 문제를 합쳐서 돌려줌"""
+        return self.quizzes + self.custom_quizzes
 
     def show_menu(self):              # 👈 self 꼭 넣기!
         print("===== 🍔 음식 퀴즈 게임 =====")
@@ -72,80 +87,65 @@ class QuizGame:
 
     def show_list(self):
         print("===== 📋 퀴즈 목록 =====")
-        for quiz in self.quizzes:          
+        for quiz in self.all_quizzes():          
             quiz.show()             
             print()     
 
     def play_quiz(self):
         score = 0
-        for quiz in self.quizzes:    # 👈 self 붙이기!
+        quizzes = self.all_quizzes()
+        random.shuffle(quizzes)
+        for quiz in quizzes:
             if quiz.ask():
                 score = score + 1
         print(f"총 {score}점이에요! 🎯")
 
+        if score > self.best_score:          # 👈 새 점수가 더 높으면?
+            self.best_score = score          # 👈 최고 점수 갱신!
+            self.save_data()
+            print(f"🏆 신기록! 최고 점수: {self.best_score}점")
+        else:
+            print(f"현재 최고 점수는 {self.best_score}점이에요! 다음엔 더 잘할 수 있어요! 💪")
+        
+
+    def run(self):
+        while True:
+            self.show_menu()                    # 메뉴 보여주기
+            choice = input("번호 선택: ")        # 입력받기
+
+            if choice == "1":
+                self.play_quiz()                # 퀴즈 풀기!
+
+            elif choice == "2":
+                q = input("문제: ")                        # 문제 입력
+                c1 = input("선택지 1: ")
+                c2 = input("선택지 2: ")
+                c3 = input("선택지 3: ")
+                c4 = input("선택지 4: ")
+                a = int(input("정답 번호(1~4): "))          # 정답 (숫자로!)
+                new_quiz = Quiz(q, [c1, c2, c3, c4], a)     # 새 custom_quiz 만들기!
+                self.custom_quizzes.append(new_quiz)               # 목록에 추가!
+                self.save_data()                          # json 파일에 저장
+                print("퀴즈가 추가됐어요! ✨")
+
+            elif choice == "3":
+                self.show_list()                # 목록 보기!
+
+            elif choice == "4":
+                print(f"🏆 최고 점수는 {self.best_score}점이에요!")
+
+            elif choice == "5":
+                print("게임을 종료해요! 👋")
+                break                           # 반복 끝!
+            else:
+                print("아직 준비 중이에요! 😊")
+
+
+
 
         
 game = QuizGame()      # 👈 인스턴스 만들기! (__init__ 실행됨)
-
-
-
-# 클래스 추가 전 내용
-
-while True:
-    print("===== 🍔 음식 퀴즈 게임 =====")
-    print("1. 퀴즈 풀기")
-    print("2. 퀴즈 추가")
-    print("3. 퀴즈 목록")
-    print("4. 최고 점수")
-    print("5. 종료")
-
-    choice = input("번호를 선택하세요: ")
-
-    if choice == "1":
-        score = 0                      # 점수 0에서 시작!
-        for quiz in quizzes:           # 문제 하나씩 꺼내서
-            if quiz.ask():             # 물어보고, 맞으면(True)
-                score = score + 1      # 점수 +1!
-        print(f"총 {score}점이에요! 🎯")  # 결과 발표!
-        if score > best_score:         # 이번 점수가 최고 점수보다 높으면?
-            best_score = score         # 최고 점수 갱신! 📈
-            print("🎉 새로운 최고 점수 달성!")
-            save_data() # 점수 저장
-        
-    elif choice == "2":
-        print("===== ✏️ 퀴즈 추가 =====")
-        question = input("질문을 입력하세요: ")
-        print("입력한 질문:", question)   # 확인용!
-        choice1 = input("선택지 1번: ")
-        choice2 = input("선택지 2번: ")
-        choice3 = input("선택지 3번: ")
-        choice4 = input("선택지 4번: ")
-        choices = [choice1, choice2, choice3, choice4] # input 받은 choice1,2,3,4를 []대괄호를 사용해 리스트로 묶음
-        answer = int(input("정답 번호 (1~4): ")) # 마찬가지로 int를 사용해 문자를 숫자로 변환해줌.
-        new_quiz = Quiz(question, choices, answer)
-        quizzes.append(new_quiz)
-        print("퀴즈가 추가되었습니다! ✅")
-        save_data()
-
-    elif choice == "3":
-        print("===== 📋 퀴즈 목록 =====")
-        for quiz in quizzes:           # 문제 하나씩 꺼내서
-            quiz.show()                # 보여주기!
-            print()                    # 한 줄 띄우기 (보기 좋게!)
-
-    elif choice == "4":
-        print("===== 🏆 최고 점수 =====")
-        if best_score == 0:           # 아직 0점이면 = 안 풀었으면
-            print("아직 퀴즈를 풀지 않았어요! 😢")
-        else:
-            print(f"최고 점수는 {best_score}점이에요! 🏆")
-
-    elif choice == "5":
-        print("게임을 종료합니다! 👋")
-        break
-
-    else:
-        print("⚠️ 1~5 사이의 번호를 입력해주세요!")
+game.run()           # 👈 game.play_quiz() 대신 이걸로!
 
 
 
