@@ -176,10 +176,11 @@ class QuizGame:
             print("아직 퀴즈가 없어요! 먼저 추가해주세요 😊")
             return
         random.shuffle(quizzes)
-        for quiz in quizzes:
+        count = input_number(f"문제 수(최대 {len(quizzes)}): ", 1, len(quizzes))
+        for quiz in quizzes[:count]:
             if quiz.ask():
                 score = score + 1
-        print(f"총 {score}점이에요! 🎯")
+        print(f"총 {count}문제 중 {score}점이에요! 🎯")
 
         if score > self.best_score:          # 👈 새 점수가 더 높으면?
             self.best_score = score          # 👈 최고 점수 갱신!
