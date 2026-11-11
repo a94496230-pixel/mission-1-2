@@ -12,12 +12,15 @@ class Quiz: # Quiz 클래스
         self.explanation = explanation
 
     def show(self):
-        print(self.question)          # 문제 출력
+        print()
+        print(f"\033[1m{self.question}\033[0m")          # 문제 출력, \033[1m굵게, \033[0m 원래대로
+        print()
         for i in range(len(self.choices)):   # 선택지 4개 반복
             print(f"{i+1}. {self.choices[i]}")
 
     def ask(self):
-        self.show()                        # 먼저 문제를 보여줘.
+        self.show()
+        print()                        # 먼저 문제를 보여줘.
         while True:
             try: # 보기를 제외한 답을 입력했을 경우 발생하는 오류 방지, 일단 시도!
                 user = int(input("정답 번호: ")) # 입력한 값을 숫자로 변환
@@ -29,14 +32,18 @@ class Quiz: # Quiz 클래스
 
         if user == self.answer:        # int는 정수. 문자를 숫자로 바꿔줌. 1도 문자 1과 숫자 1이 다름.
             print("정답이에요! 🎉")
+            print()
             if self.explanation:       # 해설이 있는 문제일 경우
                 print(f"💡 해설: {self.explanation}")  # 해설 출력!
+            print()    
             return True                   # return은 점수를 위해
     
         else:
             print(f"아쉬워요! 정답은 {self.answer}번! 😢")
+            print()
             if self.explanation:
                 print(f"💡 해설: {self.explanation}")
+            print()    
             return False
 
 
@@ -131,12 +138,16 @@ class QuizGame:
         return self.quizzes + self.custom_quizzes
 
     def show_menu(self):              # 👈 self 꼭 넣기!
-        print("===== 미션2 퀴즈 =====")
-        print("1. 퀴즈 풀기")
-        print("2. 퀴즈 추가")
-        print("3. 퀴즈 목록")
-        print("4. 최고 점수")
-        print("5. 종료")
+        print()                                    # 위쪽 여백
+        print("=" * 30)                            # 구분선 (= 30개)
+        print("      📝 미션2 퀴즈 게임")           # 제목 (앞에 공백으로 가운데 느낌)
+        print("=" * 30)
+        print("  1. 📚 퀴즈 풀기")
+        print("  2. ➕ 퀴즈 추가")
+        print("  3. 📋 퀴즈 목록")
+        print("  4. 🏆 최고 점수")
+        print("  5. 🚪 종료")
+        print("=" * 30)
 
     def show_list(self):
         print("===== 📋 퀴즈 목록 =====")
