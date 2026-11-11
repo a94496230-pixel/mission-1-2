@@ -2,17 +2,6 @@
   "best_score": 1,
   "quizzes": [
     {
-      "question": "문제 추가 테스트",
-      "choices": [
-        "정답",
-        "오답",
-        "정답",
-        " 정답"
-      ],
-      "answer": 2,
-      "explanation": "임ㄴ어륻바ㅣ즈ㅃ또ㅜㄹ"
-    },
-    {
       "question": "TEST",
       "choices": [
         "test1",

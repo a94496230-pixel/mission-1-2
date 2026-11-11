@@ -159,8 +159,9 @@ class QuizGame:
         print("  1. 📚 퀴즈 풀기")
         print("  2. ➕ 퀴즈 추가")
         print("  3. 📋 퀴즈 목록")
-        print("  4. 🏆 최고 점수")
-        print("  5. 🚪 종료")
+        print("  4. 🗑️  퀴즈 삭제")   # 새로 추가
+        print("  5. 🏆 최고 점수")
+        print("  6. 🚪 종료")
         print("=" * 30)
 
     def show_list(self):
@@ -188,6 +189,19 @@ class QuizGame:
             print(f"🏆 신기록! 최고 점수: {self.best_score}점")
         else:
             print(f"현재 최고 점수는 {self.best_score}점이에요! 다음엔 더 잘할 수 있어요! 💪")
+
+    def delete_quiz(self):  # 퀴즈 삭제 기능
+        if not self.custom_quizzes:                          # 👈 추가퀴즈 없을 때 처리
+            print("삭제할 수 있는 추가 퀴즈가 없어요!")
+            return
+        print("===== 추가 퀴즈 현황 =====")
+        for i in range(len(self.custom_quizzes)):
+            print(f"{i+1}. {self.custom_quizzes[i].question}")
+
+        num = input_number("삭제할 번호: ", 1, len(self.custom_quizzes))
+        del self.custom_quizzes[num-1]
+        self.save_data()
+        print("삭제했어요! 🗑️")    
         
 
     def run(self):
@@ -220,13 +234,16 @@ class QuizGame:
                     self.show_list()                # 목록 보기!
 
                 elif choice == "4":
-                    print(f"🏆 최고 점수는 {self.best_score}점이에요!")
+                    self.delete_quiz()          # 👈 삭제 기능 연결!
 
                 elif choice == "5":
+                    print(f"🏆 최고 점수는 {self.best_score}점이에요!")
+
+                elif choice == "6":
                     print("게임을 종료해요! 👋")
                     break                           # 반복 끝!
                 else:
-                    print("1~5 중에서 골라주세요! 😊")
+                    print("1~6 중에서 골라주세요! 😊")
 
             except (KeyboardInterrupt, EOFError):   # Ctrl+C, 입력 종료
                 print("\n안전하게 저장 후 종료할게요! 👋")
