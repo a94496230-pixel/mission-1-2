@@ -2,6 +2,8 @@ import random
 
 import json
 
+from datetime import datetime
+
 def clean(text): # 저장할 수 없는 깨진 글자(서로게이트)를 제거
     return text.encode("utf-8", "ignore").decode("utf-8")
 
@@ -114,6 +116,7 @@ class QuizGame:
                 ),
         ]
         self.custom_quizzes = []  # 추가문제를 위한 비어있는 리스트
+        self.history = []        # 👈 기록을 담을 리스트!
         self.load_data()
 
     def save_data(self):
@@ -125,6 +128,7 @@ class QuizGame:
                     "choices": q.choices,
                     "answer": q.answer,
                     "explanation": q.explanation
+                    "history": self.history
                 }
                 for q in self.custom_quizzes               # 퀴즈 하나씩 변환
             ]
@@ -142,6 +146,8 @@ class QuizGame:
                 Quiz(d["question"], d["choices"], d["answer"], d["explanation"])
                 for d in data["quizzes"]             # 딕셔너리 하나씩
             ]
+            
+
         except FileNotFoundError: # 파일이 없을 경우
             print("저장된 데이터가 없어요! 새로 시작합니다 😊")
         except (json.JSONDecodeError, KeyError): # 파일이 손상 되었을 경우
@@ -170,7 +176,7 @@ class QuizGame:
             quiz.show()             
             print()     
 
-    def play_quiz(self):
+    def play_quiz(self): # 문제 삭제 메서드
         score = 0
         quizzes = self.all_quizzes()
         if not quizzes:                      # 퀴즈가 하나도 없을경우.(미션내용. 코드에 기본문제가 포함되어있어 발생하지 않음)
@@ -182,6 +188,12 @@ class QuizGame:
             if quiz.ask():
                 score = score + 1
         print(f"총 {count}문제 중 {score}점이에요! 🎯")
+        record = {
+            "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "total": {count},          # 👈 푼 문제 수는?
+            "score": {score}           # 👈 점수는?
+            }
+        self.history.append(record)    # 리스트에 기록 추가!
 
         if score > self.best_score:          # 👈 새 점수가 더 높으면?
             self.best_score = score          # 👈 최고 점수 갱신!
@@ -192,7 +204,7 @@ class QuizGame:
 
     def delete_quiz(self):  # 퀴즈 삭제 기능
         if not self.custom_quizzes:                          # 👈 추가퀴즈 없을 때 처리
-            print("삭제할 수 있는 추가 퀴즈가 없어요!")
+            print("삭제할 수 있는 추가 퀴즈가 없어요!") 
             return
         print("===== 추가 퀴즈 현황 =====")
         for i in range(len(self.custom_quizzes)):
@@ -203,6 +215,19 @@ class QuizGame:
         self.save_data()
         print("삭제했어요! 🗑️")    
         
+    def show_history(self): # 점수 기록 기능        
+        print()
+        print("===== 🏆 점수 기록 =====")
+        print(f"최고 점수: {self.best_score}점")    # 👈 맨 위에 최고점!
+        print("-" * 24)
+
+        if not self.history:                        # 기록이 하나도 없을 때
+            print("아직 게임 기록이 없어요! 😊")
+            return
+
+        for h in self.history:                      # 기록 하나씩 출력
+            print(f"[{h['date']}] {h['total']}문제 중 {h['score']}점")
+
 
     def run(self):
         while True:
