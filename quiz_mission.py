@@ -3,10 +3,11 @@ import json
 
 # 📐 퀴즈 1문제 설계도
 class Quiz: # Quiz 클래스
-    def __init__(self, question, choices, answer): # 정보 담기
+    def __init__(self, question, choices, answer, explanation=""): # 정보 담기
         self.question = question
         self.choices = choices
         self.answer = answer
+        self.explanation = explanation
 
     def show(self):
         print(self.question)          # 문제 출력
@@ -26,10 +27,17 @@ class Quiz: # Quiz 클래스
 
         if user == self.answer:        # int는 정수. 문자를 숫자로 바꿔줌. 1도 문자 1과 숫자 1이 다름.
             print("정답이에요! 🎉")
+            if self.explanation:       # 해설이 있는 문제일 경우
+                print(f"💡 해설: {self.explanation}")  # 해설 출력!
             return True                   # return은 점수를 위해
+    
         else:
             print(f"아쉬워요! 정답은 {self.answer}번! 😢")
+            if self.explanation:
+                print(f"💡 해설: {self.explanation}")
             return False
+
+
         
 
 # QuizGame 클래스 추가 
@@ -44,35 +52,45 @@ class QuizGame:
                  "bool은 True 또는 False 값을 가진다.",
                  "list는 여러 값을 순서대로 담는 자료형이다.",
                  "dict는 값을 순서(인덱스 번호)로만 꺼낼 수 있다."],
-                4),
+                4,
+                "dict는 인덱스가 아니라 '키(key)'로 값을 꺼낸다. (순서로 꺼내는 건 list)"
+                ),
             Quiz(
                 "클래스의 __init__ 메서드에 대한 설명으로 옳은 것은?",
                 ["프로그램이 종료될 때 자동으로 호출된다.",
                  "객체가 생성될 때 자동으로 호출되어 속성을 초기화한다.",
                  "클래스당 한 번만 호출되며 모든 객체가 값을 공유한다.",
                  "반드시 return 값을 지정해야 한다."],
-                2),
+                2,
+                "__init__은 객체 생성 시 자동 호출되어 속성을 초기화하는 생성자다."
+                ),
             Quiz(
                 "인스턴스 메서드의 첫 번째 매개변수 self의 역할로 옳은 것은?",
                 ["클래스 외부에서만 쓰이는 특별한 예약어다.",
                  "객체 자신을 가리켜 각 객체가 독립된 속성값을 갖게 한다.",
                  "생략해도 항상 정상 동작한다.",
                  "모든 객체가 같은 속성값을 공유하게 만든다."],
-                2),
+                2,
+                "self는 객체 자신을 가리켜 각 객체가 독립된 속성값을 갖게 한다."
+                ),
             Quiz(
                 "state.json 같은 파일에 데이터를 저장했다가 다시 불러오는 이유로 가장 적절한 것은?",
                 ["프로그램 실행 속도를 높이기 위해서",
                  "프로그램을 껐다 켜도 데이터가 유지되도록(데이터 영속성) 하기 위해서",
                  "코드 줄 수를 줄이기 위해서",
                  "메모리 사용량을 0으로 만들기 위해서"],
-                2),
+                2,
+                "파일에 저장하면 프로그램을 껐다 켜도 데이터가 유지된다(데이터 영속성)."
+                ),
             Quiz(
                 "파일이 없거나 손상되었을 때 프로그램이 멈추지 않게 하는 방법으로 가장 적절한 것은?",
                 ["try/except로 예외를 잡아 기본 데이터로 복구한다.",
                  "오류가 나면 프로그램을 즉시 강제 종료한다.",
                  "예외 처리 없이 그대로 실행한다.",
                  "파일이 생길 때까지 무한 반복한다."],
-                1),
+                1,
+                "try/except로 예외를 잡으면 파일 오류에도 멈추지 않고 복구할 수 있다."
+                ),
         ]
         self.custom_quizzes = []  # 추가문제를 위한 비어있는 리스트
         self.load_data()
@@ -84,7 +102,8 @@ class QuizGame:
                 {
                     "question": q.question,
                     "choices": q.choices,
-                    "answer": q.answer
+                    "answer": q.answer,
+                    "explanation": q.explanation
                 }
                 for q in self.custom_quizzes               # 퀴즈 하나씩 변환
             ]
@@ -99,7 +118,7 @@ class QuizGame:
                 data = json.load(f)                  # 파일 읽기
             self.best_score = data["best_score"]     # 점수는 그대로
             self.custom_quizzes = [                         # 👇 여기에서 추가문제 조립!
-                Quiz(d["question"], d["choices"], d["answer"])
+                Quiz(d["question"], d["choices"], d["answer"], d["explanation"])
                 for d in data["quizzes"]             # 딕셔너리 하나씩
             ]
         except:
@@ -154,8 +173,9 @@ class QuizGame:
                 c2 = input("선택지 2: ")
                 c3 = input("선택지 3: ")
                 c4 = input("선택지 4: ")
-                a = int(input("정답 번호(1~4): "))          # 정답 (숫자로!)
-                new_quiz = Quiz(q, [c1, c2, c3, c4], a)     # 새 custom_quiz 만들기!
+                a = int(input("정답 번호(1~4): "))  # 정답 (숫자로!)
+                e = input("해설: ")          
+                new_quiz = Quiz(q, [c1, c2, c3, c4], a, e)     # 새 custom_quiz 만들기!
                 self.custom_quizzes.append(new_quiz)               # 목록에 추가!
                 self.save_data()                          # json 파일에 저장
                 print("퀴즈가 추가됐어요! ✨")
