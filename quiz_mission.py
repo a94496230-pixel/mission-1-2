@@ -122,13 +122,13 @@ class QuizGame:
     def save_data(self):
         data = {
             "best_score": self.best_score,          # 최고 점수
+            "history": self.history,
             "quizzes": [                            # 퀴즈들을 딕셔너리로!
                 {
                     "question": q.question,
                     "choices": q.choices,
                     "answer": q.answer,
                     "explanation": q.explanation
-                    "history": self.history
                 }
                 for q in self.custom_quizzes               # 퀴즈 하나씩 변환
             ]
@@ -137,11 +137,12 @@ class QuizGame:
             json.dump(data, f, ensure_ascii=False, indent=2)
         print("저장 완료!")
 
-    def load_data(self):
+    def load_data(self):  
         try:
             with open("state.json", "r", encoding="utf-8") as f:
                 data = json.load(f)                  # 파일 읽기
-            self.best_score = data["best_score"]     # 점수는 그대로
+            self.best_score = data.get("best_score", 0)     # 점수는 그대로
+            self.history = data.get("history", [])   # 👈 기록 불러오기(없으면 빈 리스트)
             self.custom_quizzes = [                         # 👇 여기에서 추가문제 조립!
                 Quiz(d["question"], d["choices"], d["answer"], d["explanation"])
                 for d in data["quizzes"]             # 딕셔너리 하나씩
@@ -166,7 +167,7 @@ class QuizGame:
         print("  2. ➕ 퀴즈 추가")
         print("  3. 📋 퀴즈 목록")
         print("  4. 🗑️  퀴즈 삭제")   # 새로 추가
-        print("  5. 🏆 최고 점수")
+        print("  5. 🏆 점수 기록")
         print("  6. 🚪 종료")
         print("=" * 30)
 
@@ -176,7 +177,7 @@ class QuizGame:
             quiz.show()             
             print()     
 
-    def play_quiz(self): # 문제 삭제 메서드
+    def play_quiz(self): 
         score = 0
         quizzes = self.all_quizzes()
         if not quizzes:                      # 퀴즈가 하나도 없을경우.(미션내용. 코드에 기본문제가 포함되어있어 발생하지 않음)
@@ -190,17 +191,18 @@ class QuizGame:
         print(f"총 {count}문제 중 {score}점이에요! 🎯")
         record = {
             "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
-            "total": {count},          # 👈 푼 문제 수는?
-            "score": {score}           # 👈 점수는?
+            "total": count,          # 👈 푼 문제 수는?
+            "score": score           # 👈 점수는?
             }
         self.history.append(record)    # 리스트에 기록 추가!
 
         if score > self.best_score:          # 👈 새 점수가 더 높으면?
             self.best_score = score          # 👈 최고 점수 갱신!
-            self.save_data()
             print(f"🏆 신기록! 최고 점수: {self.best_score}점")
         else:
             print(f"현재 최고 점수는 {self.best_score}점이에요! 다음엔 더 잘할 수 있어요! 💪")
+        self.save_data() # 기록 항상 저장
+
 
     def delete_quiz(self):  # 퀴즈 삭제 기능
         if not self.custom_quizzes:                          # 👈 추가퀴즈 없을 때 처리
@@ -218,14 +220,15 @@ class QuizGame:
     def show_history(self): # 점수 기록 기능        
         print()
         print("===== 🏆 점수 기록 =====")
-        print(f"최고 점수: {self.best_score}점")    # 👈 맨 위에 최고점!
-        print("-" * 24)
 
         if not self.history:                        # 기록이 하나도 없을 때
             print("아직 게임 기록이 없어요! 😊")
             return
 
-        for h in self.history:                      # 기록 하나씩 출력
+        best = max(self.history, key=lambda h: h["score"])   # score 기준
+        print(f"🏆 최고 점수: [{best['date']}] {best['total']}문제 중 {best['score']}점")
+        print("-" * 24)
+        for h in reversed(self.history):                      # 기록 하나씩 출력, 리버스는 최근기록이 위에 오도록.
             print(f"[{h['date']}] {h['total']}문제 중 {h['score']}점")
 
 
@@ -262,7 +265,7 @@ class QuizGame:
                     self.delete_quiz()          # 👈 삭제 기능 연결!
 
                 elif choice == "5":
-                    print(f"🏆 최고 점수는 {self.best_score}점이에요!")
+                    self.show_history()  # 점수 기록 출력
 
                 elif choice == "6":
                     print("게임을 종료해요! 👋")
