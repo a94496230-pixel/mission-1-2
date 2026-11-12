@@ -1,31 +1,31 @@
-import random
+import random  # import는 도구상자를 가져오는 명령어
 
 import json
 
-from datetime import datetime
+from datetime import datetime # from A import B 는 A에서 B만 가져온다. 앞의 datetime은 모듈(상자), 뒤는 여러 도구중 하나(datetime, date, time, ...)
 
-def clean(text): # 저장할 수 없는 깨진 글자(서로게이트)를 제거
-    return text.encode("utf-8", "ignore").decode("utf-8")
+def clean(text): # def 정의해. clean 이라는 이름. text라는 매개변수를 받는다.
+    return text.encode("utf-8", "ignore").decode("utf-8") # return 보여줘. encode하고 불가능한건 ignore한 다음 decode한 값을.
 
 def input_number(prompt, low, high): # 반복적으로 사용된 while루프를 함수로 만들어 아래 적용. low~high 범위 숫자를 받을 때 까지 반복함.
     
-    while True:
-        value = input(prompt).strip()   # 앞뒤 공백 제거
-        if value == "":                 # 빈 입력
-            print("숫자를 입력해주세요!")
-            continue
-        try:
-            num = int(value)
-            if low <= num <= high:
-                return num              # 올바른 값이면 돌려줌
-            else:
-                print(f"{low}~{high} 중에서 골라주세요!")
-        except ValueError:
+    while True: # 무한 반복
+        value = input(prompt).strip()   # 입력값의 .strip() 앞뒤 공백 제거
+        if value == "":                 # 빈입력시 
+            print("숫자를 입력해주세요!")  # 안내 멘트 출력
+            continue                    # continue -> 루프의 처음으로.
+        try:                            # 시도해봐
+            num = int(value)            # 문자로 입력된 값(3)을 숫자(3)으로 변환. -> 실패 가능함.
+            if low <= num <= high:      # 범위 지정
+                return num              # 올바른 값이면 값을 돌려주고(표시), 루프 종료. return은 함수를 종료하고 값을 반환함.
+            else:                       # 범위 밖의 숫자가 입력될 경우
+                print(f"{low}~{high} 중에서 골라주세요!")  # 안내 멘트 표시, 루프기 때문에 다시 처음으로 돌아감.
+        except ValueError:              # ValueError, 타입은 맞지만 내용이 부적절할 때 발생하는 에러. int("abc")를 보면 int는 문자열을 받을 수 있어 타입은 맞지만, 해당 문자는 숫자로 변환이 불가능 값이라 나오는 에러.
             print("숫자로 입력해주세요!")
 
 
-# 📐 퀴즈 1문제 설계도
-class Quiz: # Quiz 클래스
+
+class Quiz: # Quiz 클래스, 문제를 하나 찍어내기 위한 틀
     def __init__(self, question, choices, answer, explanation="", hint=""): # 정보 담기
         self.question = question
         self.choices = choices
