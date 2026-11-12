@@ -26,19 +26,19 @@ def input_number(prompt, low, high): # 반복적으로 사용된 while루프를 
 
 
 class Quiz: # Quiz 클래스, 문제를 하나 찍어내기 위한 틀
-    def __init__(self, question, choices, answer, explanation="", hint=""): # 정보 담기
-        self.question = question
-        self.choices = choices
+    def __init__(self, question, choices, answer, explanation="", hint=""): # __init__ 객체가 생성될 때 자동실행. self는 만들어지는 객체, q,c,a,e,h로 문제가 구성됨.
+        self.question = question            # 만들어질 Quiz라는 객체에, 앞선 question은 개념, 공간 자체 = 뒤의 question을 앞선 question에 넣는다.
+        self.choices = choices              # 이하동문.
         self.answer = answer
         self.explanation = explanation
-        self.hint = hint
+        self.hint = hint                    # Quiz라는 객체에(문제, 선지, 답, 해설, 힌트)가 존재하게 되며 해설과 힌트는 없을 수 있다. =""
 
-    def show(self):
-        print()
+    def show(self):                         # Quiz 클래스 속에서 show를 정의함
+        print()                             # 가독성을 위한 공백
         print(f"\033[1m{self.question}\033[0m")          # 문제 출력, \033[1m굵게, \033[0m 원래대로
-        print()
-        for i in range(len(self.choices)):   # 선택지 4개 반복
-            print(f"{i+1}. {self.choices[i]}")
+        print()                             # 공백
+        for i in range(len(self.choices)):  # for [꺼낸거] in [꺼낼 대상] 하나씩 꺼낸다, i 는 임의로 지정한 값, range 범위값 range없이 숫자만 적으면 4라는 하나의 항목만 나옴, len은 만들어진 Quiz객체(self)의 choice리스트 안의 항목의 개수를 세어줌 
+            print(f"{i+1}. {self.choices[i]}")  # 
 
     def ask(self):
         self.show()
