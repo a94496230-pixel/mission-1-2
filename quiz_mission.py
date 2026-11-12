@@ -26,11 +26,12 @@ def input_number(prompt, low, high): # 반복적으로 사용된 while루프를 
 
 # 📐 퀴즈 1문제 설계도
 class Quiz: # Quiz 클래스
-    def __init__(self, question, choices, answer, explanation=""): # 정보 담기
+    def __init__(self, question, choices, answer, explanation="", hint=""): # 정보 담기
         self.question = question
         self.choices = choices
         self.answer = answer
         self.explanation = explanation
+        self.hint = hint
 
     def show(self):
         print()
@@ -42,6 +43,25 @@ class Quiz: # Quiz 클래스
     def ask(self):
         self.show()
         print()                        # 먼저 문제를 보여줘.
+
+        used_hint = False  # 힌트 사용여부 기록
+
+        if self.hint: # 힌트가 있을 경우에만
+            while True:
+
+                choice = input("힌트를 볼까요? (y/n): ").strip().lower()
+                if choice == "y":
+                    print(f"💡 힌트: {self.hint}")
+                    used_hint = True  # 힌트 사용 확인
+                    break
+                
+                elif choice == "n":
+                    break
+                else:
+                    print("y / n 으로 입력해주세요!")
+            print()
+                    
+
         user = input_number("정답 번호: ", 1, 4)  # while 루프를 함수로 대체
 
         if user == self.answer:        # int는 정수. 문자를 숫자로 바꿔줌. 1도 문자 1과 숫자 1이 다름.
@@ -50,7 +70,7 @@ class Quiz: # Quiz 클래스
             if self.explanation:       # 해설이 있는 문제일 경우
                 print(f"💡 해설: {self.explanation}")  # 해설 출력!
             print()    
-            return True                   # return은 점수를 위해
+            return True, used_hint                  # return은 점수를 위해
     
         else:
             print(f"아쉬워요! 정답은 {self.answer}번! 😢")
@@ -58,7 +78,7 @@ class Quiz: # Quiz 클래스
             if self.explanation:
                 print(f"💡 해설: {self.explanation}")
             print()    
-            return False
+            return False, used_hint
 
 
         
@@ -128,11 +148,13 @@ class QuizGame:
                     "question": q.question,
                     "choices": q.choices,
                     "answer": q.answer,
-                    "explanation": q.explanation
+                    "explanation": q.explanation,
+                    "hint": q.hint
                 }
-                for q in self.custom_quizzes               # 퀴즈 하나씩 변환
-            ]
-        }
+                for q in self.custom_quizzes
+            ]             
+        }   
+
         with open("state.json", "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
         print("저장 완료!")
@@ -144,7 +166,7 @@ class QuizGame:
             self.best_score = data.get("best_score", 0)     # 점수는 그대로
             self.history = data.get("history", [])   # 👈 기록 불러오기(없으면 빈 리스트)
             self.custom_quizzes = [                         # 👇 여기에서 추가문제 조립!
-                Quiz(d["question"], d["choices"], d["answer"], d["explanation"])
+                Quiz(d["question"], d["choices"], d["answer"], d.get("explanation", ""), d.get("hint", ""))
                 for d in data["quizzes"]             # 딕셔너리 하나씩
             ]
             
@@ -185,9 +207,15 @@ class QuizGame:
             return
         random.shuffle(quizzes)
         count = input_number(f"문제 수(최대 {len(quizzes)}): ", 1, len(quizzes))
+
         for quiz in quizzes[:count]:
-            if quiz.ask():
-                score = score + 1
+            correct, used_hint = quiz.ask()
+            if correct:
+                if used_hint:
+                    score += 0.5
+                else:
+                    score += 1
+
         print(f"총 {count}문제 중 {score}점이에요! 🎯")
         record = {
             "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
@@ -252,8 +280,9 @@ class QuizGame:
                     c3 = clean(input("선택지 3: "))
                     c4 = clean(input("선택지 4: "))
                     a = input_number("정답 번호(1~4): ", 1, 4)   # 👈 숫자는 그대로 둬요!
-                    e = clean(input("해설: "))          
-                    new_quiz = Quiz(q, [c1, c2, c3, c4], a, e)     # 새 custom_quiz 만들기!
+                    e = clean(input("해설: "))
+                    h = clean(input("힌트: "))          
+                    new_quiz = Quiz(q, [c1, c2, c3, c4], a, e, h)     # 새 custom_quiz 만들기!
                     self.custom_quizzes.append(new_quiz)               # 목록에 추가!
                     self.save_data()                          # json 파일에 저장
                     print("퀴즈가 추가됐어요! ✨")
