@@ -5,7 +5,30 @@
       "date": "2026-11-12 13:42",
       "total": 2,
       "score": 1
+    },
+    {
+      "date": "2026-11-12 15:57",
+      "total": 1,
+      "score": 1
+    },
+    {
+      "date": "2026-11-12 16:01",
+      "total": 6,
+      "score": 1
     }
   ],
-  "quizzes": []
+  "quizzes": [
+    {
+      "question": "TEST",
+      "choices": [
+        "오답",
+        "오답",
+        "정답",
+        "오답"
+      ],
+      "answer": 3,
+      "explanation": "오답은 답이 아니다.",
+      "hint": "선택지를 잘 봐라."
+    }
+  ]
 }
