@@ -5,7 +5,7 @@ import json
 from datetime import datetime # from A import B 는 A에서 B만 가져온다. 앞의 datetime은 모듈(상자), 뒤는 여러 도구중 하나(datetime, date, time, ...)
 
 def clean(text): # def 정의해. clean 이라는 이름. text라는 매개변수를 받는다.
-    return text.encode("utf-8", "ignore").decode("utf-8") # return 보여줘. encode하고 불가능한건 ignore한 다음 decode한 값을.
+    return text.encode("utf-8", "ignore").decode("utf-8") # return 보여줘. text를, encode하고 불가능한건 ignore한 다음 decode한 값을.
 
 def input_number(prompt, low, high): # 반복적으로 사용된 while루프를 함수로 만들어 아래 적용. low~high 범위 숫자를 받을 때 까지 반복함.
     
@@ -23,11 +23,13 @@ def input_number(prompt, low, high): # 반복적으로 사용된 while루프를 
         except ValueError:              # ValueError, 타입은 맞지만 내용이 부적절할 때 발생하는 에러. int("abc")를 보면 int는 문자열을 받을 수 있어 타입은 맞지만, 해당 문자는 숫자로 변환이 불가능 값이라 나오는 에러.
             print("숫자로 입력해주세요!")
 
+            ### 중요사항. if 뒤에 elif가 아니라 try를 쓴 이유. if elif else는 조건문이지만, try except는 예외처리문이다. try에서 에러가 발생하면 except로 넘어가고, 에러가 없으면 except를 건너뛰고 다음으로 넘어간다. 따라서 if elif else로 하면 ValueError가 발생하면 프로그램이 종료되지만, try except로 하면 ValueError가 발생해도 프로그램이 종료되지 않고 안내 멘트만 출력하고 다시 루프의 처음으로 돌아간다.
+
 
 
 class Quiz: # Quiz 클래스, 문제를 하나 찍어내기 위한 틀
     def __init__(self, question, choices, answer, explanation="", hint=""): # __init__ 객체가 생성될 때 자동실행. self는 만들어지는 객체, q,c,a,e,h로 문제가 구성됨.
-        self.question = question            # 만들어질 Quiz라는 객체에, 앞선 question은 개념, 공간 자체 = 뒤의 question을 앞선 question에 넣는다.
+        self.question = question            # self.question이라는 속성에 question을 넣어줌. 즉, Quiz라는 객체에 question이라는 속성이 생김.
         self.choices = choices              # 이하동문.
         self.answer = answer
         self.explanation = explanation
@@ -37,7 +39,7 @@ class Quiz: # Quiz 클래스, 문제를 하나 찍어내기 위한 틀
         print()                             # 가독성을 위한 공백
         print(f"\033[1m{self.question}\033[0m")          # 문제 출력, \033[1m굵게, \033[0m 원래대로
         print()                             # 공백
-        for i in range(len(self.choices)):  # for [꺼낸거] in [꺼낼 대상] 하나씩 꺼낸다, i 는 임의로 지정한 값, range 범위값 range없이 숫자만 적으면 4라는 하나의 항목만 나옴, len은 만들어진 Quiz객체(self)의 choice리스트 안의 항목의 개수를 세어줌 
+        for i in range(len(self.choices)):  # for [꺼낸거] in [꺼낼 대상] 하나씩 꺼내서 반복, i 는 임의로 지정한 값, range 범위값 range없이 숫자만 적으면 4라는 하나의 항목만 나옴, len은 만들어진 Quiz객체(self)의 choice리스트 안의 항목의 개수를 세어줌 
             print(f"{i+1}. {self.choices[i]}")  # 
 
     def ask(self):
@@ -145,9 +147,9 @@ class QuizGame:
         data = {
             "best_score": self.best_score,          # 최고 점수
             "history": self.history,
-            "quizzes": [                            # 퀴즈들을 딕셔너리로!
-                {
-                    "question": q.question,
+            "quizzes": [                            # list로 퀴즈의 구성요소들을 묶는다. [대괄호]로 감싼다.
+                {                                   # 구성요소들을 dict딕셔너리로! {중괄호}로 감싼다.
+                    "question": q.question,         # dict는 키와 값으로 구성된다. 여기서 key는 "question", value는 q.question
                     "choices": q.choices,
                     "answer": q.answer,
                     "explanation": q.explanation,
