@@ -14,7 +14,7 @@ Python 기본 문법과 클래스(객체 지향), JSON 파일 저장, Git/GitHub
 
 ## 2. 퀴즈 주제와 선정 이유
 
-**주제: Python 기초 · 클래스 · 파일 입출력 · 예외 처리 (이번 미션의 학습 내용)**
+**주제: Python 기초 등 (이번 미션의 학습 내용)**
 
 - 이 미션의 학습 목표(자료형, 클래스, `__init__`/`self`, JSON 저장, `try/except`)를 퀴즈로 만들면 **문제를 만드는 과정 자체가 복습**이 된다고 생각했습니다.
 - 게임을 플레이할 때마다 "왜 이렇게 동작하는지"를 다시 설명해 보게 되고, 해설(explanation)을 함께 작성하면서 개념을 내 말로 정리할 수 있습니다.
@@ -28,8 +28,8 @@ Python 기본 문법과 클래스(객체 지향), JSON 파일 저장, Git/GitHub
 
 ### 실행
 ```bash
-git clone https://github.com/<내-계정>/<저장소-이름>.git
-cd <저장소-이름>
+git clone https://github.com/a94496230-pixel/mission-1-2
+cd mission-1-2
 python quiz_mission.py
 ```
 
@@ -70,11 +70,11 @@ python quiz_mission.py
 
 | 메뉴 | 퀴즈 풀기 |
 |---|---|
-| ![menu](docs/screenshots/menu.png) | ![play](docs/screenshots/play.png) |
+| ![menu](images/menu.png) | ![play](images/play.png) |
 
 | 퀴즈 추가 | 점수 기록 |
 |---|---|
-| ![add_quiz](docs/screenshots/add_quiz.png) | ![score](docs/screenshots/score.png) |
+| ![add_quiz](images/add_quiz.png) | ![score](images/score.png) |
 
 ## 6. 파일 구조
 
@@ -153,15 +153,33 @@ python quiz_mission.py
 
 ## 8. Git 작업 기록
 
-- 기능 단위로 커밋했으며, 커밋 메시지는 `Feat:`, `Fix:`, `Docs:`, `Refactor:` 형식으로 작성했습니다.
-- `feature/play-quiz` 브랜치에서 퀴즈 풀기 기능을 개발한 뒤 `main`에 병합했습니다.
-- 개발 완료 후 저장소를 별도 디렉터리에 `clone`하고, 변경 → `commit` → `push` 한 내용을 기존 작업 디렉터리에서 `pull`로 가져와 반영을 확인했습니다.
+- 기능 단위로 커밋했으며, 커밋 메시지는 미션 수행 과정에 맞춰 작성했습니다.
+- `readme` README.md파일을 작성하고 `main`에 병합했습니다.
+- 퀴즈게임 완성 후 저장소를 별도 디렉터리에 `clone`하고, 변경 → `commit` → `push` 한 내용을 기존 작업 디렉터리에서 `pull`로 가져와 반영을 확인했습니다.
 
 ```text
-(여기에 `git log --oneline --graph` 결과를 붙여 넣으세요)
+$ git log --oneline --graph
+* 6c27e0c (HEAD -> readme, origin/main, origin/HEAD, main) README 작성 초안
+* cdb630b 퀴즈게임 코드 학습하며 주석
+* 8acb3d4 완성된 게임 검토, 학습 중
+* b0a09c6 완성된 코드 구조 및 기능 분석
+* 3aff079 간단한 오타 및 가독성 수정
+* 4093639 문제 힌트 기능 추가
+* 6a52604 점수 기록 기능 추가
+* cbeb5f1 점수 기록 기능 추가 중. 미완성
+* 24b1b85 문제 삭제 기능 업데이트
+* a36b87b 문제 수 선택 기능 추가
+* ffc9549 숫자를 입력하기 위한 strip() 등 예외조건의 while루프를 함수로 대체함
+* 503c058 while루프를 함수로 대체 전 커밋.
+* c371651 미션 요구내용 보완. strip(), except오류잡기 조건 등
+* 3114653 퀴즈게임 가독성관련 업데이트
+* edcb743 문제 추가 중 글자깨짐으로 인한 오류 수정
+* 91b62b2 문제 해설 출력기능 추가
+* 910a011 주제설정, 기본문제 5개 입력
+* 1de7486 클래스 추가(2개), 문제 출시순서 무작위 추가
+* 00fc9ee 완성된 게임에 클래스 추가 중
+* 05caeb2 미션 퀴즈게임 틀 만들기
+* cb99519 2번 문제까지
 ```
 
-## 9. 배운 점
 
-<!-- 미션을 하며 막혔던 부분, 해결 방법, 새로 알게 된 것을 본인 말로 2~3줄 적어 보세요. -->
--

@@ -15,6 +15,11 @@
       "date": "2026-11-12 16:01",
       "total": 6,
       "score": 1
+    },
+    {
+      "date": "2026-11-18 21:49",
+      "total": 2,
+      "score": 0
     }
   ],
   "quizzes": [
@@ -29,6 +34,18 @@
       "answer": 3,
       "explanation": "오답은 답이 아니다.",
       "hint": "선택지를 잘 봐라."
+    },
+    {
+      "question": "Add Quiz",
+      "choices": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "answer": 1,
+      "explanation": "TEST",
+      "hint": "TEST"
     }
   ]
 }
