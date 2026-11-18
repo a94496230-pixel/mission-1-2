@@ -201,3 +201,19 @@ $ git log --oneline --graph
 * 05caeb2 미션 퀴즈게임 틀 만들기
 * cb99519 2번 문제까지
 ```
+- readme 브랜치 main으로 병합한 기록
+
+```bash
+$ git branch # 현재 브랜치 목록
+* main       # 현재 사용중인 브랜치
+  readme
+```
+
+```bash
+$ git merge readme  # readme를 현재 브랜치인 main에 병합
+Updating d0c8da9..d34cf1b
+Fast-forward
+ .gitignore | 3 ++-
+ state.json | 5 +++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+```
